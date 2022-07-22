@@ -1,0 +1,227 @@
+	
+	
+DESCRIPTION
+
+	Pizazz is a library/wrapper for working with GM's built-in particle systems.
+	
+	It is meant to simplify working with basic paricle systems in a way that stores most of the system's
+	variables inside struct elements to simplify what you need to provide for each interaction.
+	
+	The only major setup required is creating/defining your particles in pizazz_particles. 
+	Afterward, Pizazz can use those particles and assign them to particle systems and emitters as requested.
+	Additionally, you may set some default values in pizazz_config
+	
+	TRADITIONALLY, to create a particle system and immediately use them, your code would look something like this:
+		
+		ps = part_system_create();
+		em1 = part_emitter_create(ps);
+		part_emitter_region(ps,em1,x-5,x+5,y-5,y+5,ps_shape_ellipse, ps_distr_linear);
+		part_emitter_burst(ps,em1,global.fire_particle,6);
+		
+	With Pizazz, the same result could be coded as:
+	
+		pz_fire = create_pizazz(PzParticle.fire).burst(6)
+		
+	Alternatively, with the same degree of customization (not using default values):
+	
+		pz_fire = create_pizazz(PzParticle.fire).move(x,y).size(10,10,ps_shape_ellipse,ps_distr_linear).burst(6);
+		
+	Pizazz can also destroy particle systems automatically as soon as an effect is done, so one-time-use 
+	effects are possible in just one line of code:
+	
+		create_pizazz(PzParticle.fire).move(x,y).burst(10).finish();
+
+
+EXMAPLE USAGE
+
+	The following example will create a new effect with two different emitters/particles. The first
+	emitter will use PzParticle.fire and be given a default stream/burst amount of 3. The second emitter 
+	will use PzParticle.spark and be given a default stream/burst amount of -10 (1/10 chance per frame).
+	Then the whole sytem will then be moved to the given location and begin streaming from each emitter
+	at the provided emit defaults.
+	
+		fire = create_pizazz(PzParticle.fire,3);
+		fire.add_emitter(PzParticle.fire_spark,-10);
+		fire.move(x,y).stream();
+	
+	When using multiple emitters, another option instead of using emit defaults is to set an "emit factor" 
+	for each emitter.
+	The following code will create a similar setup as above, except the emit factors will be set to 1 and .5, 
+	which will override any set emit defaults.
+	the third line of code will then move the emitters, burst 12 particles from the PzParticle.fire 
+	emitter and 6 particles from PzParticle.spark emitter (because of the .5 emit factor), then queue
+	the system to be automatically destroyed after all particles are gone.
+
+		fire = create_pizazz(PzParticle.fire).emit_factor(1)
+		fire.add_emitter(PzParticle.spark).emit_factor(.5)
+		fire.move(x,y).burst(12).finish();
+		
+	WARNING - if chaining methods together on the create_pizzaz() function, be careful with adding or getting 
+	any emitters, as they will return the emitter struct instead of the pizazz struct. For exmaple, the
+	following code will store the second emitter in the "fire" variable, instead of the pizazz system.
+	
+		//DO NOT do this. 
+		//It will return the emitter element to the "fire" variable instead of the pizazz element:
+		fire = create_pizazz(PzParticle.fire).add_emitter(PzParticle.spark)
+
+	
+FUNCTIONS
+
+	create_pizazz([PzParticle.p],[emit_factor]) 
+
+		|	Creates a new pizazz element struct. 
+		|	
+		|	Optionally, you can provide the particle to be used for the first
+		|	emitter (will not be created unless provided) and its burst and stream emit 
+		|	defaults (set to the __pizazz_emit_default macro in pizazz_config if not provided).
+		|	
+		|	RETURNS - Pizazz element
+	
+	
+
+PIZAZZ ELEMENT METHODS
+
+	The following methods can be called from the pizazz element. 
+	Each method that returns the pizazz element can be chained together, as shown in the examples above.
+		
+	add_emitter(PzParticle.p,[emit_default])	
+	
+		|	adds an emitter to the pizazz struct at the default values set in pizazz_config. 
+		|	Optionally, you can pass in a custom emit default which will set both the
+		|	burst default and stream default values for use with stream() and burst() without any arguments.
+		|	for separate burst and stream emit defaults, you can call emit_defaults() from the emitter struct
+		|		
+		|	RETURNS - new emitter element (so you can instantly call size/move/emit_defaults/etc. if needed)
+		
+	size(w,h,[ps_shape],[ps_distr], [resize_emitters])
+
+		|	set the default emitter size and shape for this pizazz struct.
+		|	if resize_emitters is true (default), also resizes all existing emitters to the 
+		|	given width and height, and shape and distrobution if provided.
+		|		
+		|	RETURNS - pizazz element (self)
+	
+	move(x,y,[z],[update_emitters],[update_depth])		
+	
+		|	set the default emitter location to the given x,y,[z]
+		|	if update_emitters is true (default), also updates all emitter locations to 
+		|	the given location.
+		|	if update_depth is true (default), also sets the system's depth based on 
+		|	the __pizazz_depth_formula macro found in pizazz_config. this default
+		|	can be changed with the macro __pizazz_option_autoUpdateDepth in pizazz_config
+		|		
+		|	RETURNS - pizazz element (self)
+		
+	set_depth(depth)
+		
+		|	Sets the particle system depth to a specific value. Useful when you don't want depth to be 
+		|	automatically updated by move() or based on y position (default behavior)
+		|
+		|	RETURNS - pizazz element (self
+	
+	burst([amount])
+	
+		|	calls the burst() method of every emitter in this pizazz element.
+		|		
+		|	RETURNS - pizazz element (self)
+			
+	stream([amount])
+	
+		|	calls the stream() method of every emitter in this pizazz element.
+		|		
+		|	RETURNS - pizazz element (self)
+			
+	finish()
+	
+		|	stops all emitters and destroys the particle system once all 
+		|	particles are gone.
+		|	
+		|	RETURNS - pizazz element (self)
+		
+	destroy()
+	
+		|	instantly destroys the particle system
+			
+	get_emitter_ind(ind)
+	
+		|	returns the given emitter struct, if it exists, based on creation order (emitter 
+		|	0 would be the first one added to the struct). else returns keyword noone.
+		|
+		|	RETURNS - emitter element OR keyword noone
+			
+	get_part_emitter(PzParticle.p)
+	
+		|	returns the first emitter found with the given PzParticle.p, if it exists. 
+		|	Otherwise, ruturns keyword noone.
+		|
+		|	RETURNS - emitter element OR keyword noone
+			
+	
+
+PIZZAZ EMITTER ELEMENT METHODS
+	
+	These methods can be used to modify emitter elements returned from 
+	add_emitter(), get_emitter_ind(), and get_part_emitter().
+	
+	size(w,h,[ps_shape],[ps_distr])
+	
+		|	resizes the current emitter to the given width and height.
+		|	Will also set the emitter shape and distrobution if provided. 
+		|	WARNING -  calling size() from the pizzaz element can override changes set on 
+		|	a per-emitter basis
+		|		
+		|	RETURNS - emitter element (self)
+			
+	move(x,y,[z])
+	
+		|	moves this emitter to the given x,y,[z]
+		|	WARNING -  calling move() from the pizzaz element can override changes set on 
+		|	a per-emitter basis, including the system's depth value. to set a system depth 
+		|	with varied emitter locations, set the pizazz element location before changing
+		|	individual emitters.
+		|		
+		|	RETURNS - emitter element (self)
+	
+	
+	burst([amount])
+	
+		|	Bursts the amount of particles set by emit_defaults() or on emitter creation.
+		|	If an amount argument is provided, the emit default will be ignored and 
+		|	the emitter will burst the given amount, adjusted by the emit factor (if set)
+		|		
+		|	RETURNS - emitter element (self)
+			
+	stream([amount])
+	
+		|	Streams the amount of particles set by emit_defaults() or on emitter creation.
+		|	If an amount argument is provided, the emit default will be ignored and 
+		|	the emitter will stream the given amount, adjusted by the emit factor (if set)
+		|		
+		|	RETURNS - emitter element (self)
+
+	emit_defaults([burst_amount],[stream_amount])
+	
+		|	Sets separate burst or stream emit defaults, (rather than them being the same number as when 
+		|	creating the emitter) and removes any previously set emit factor.
+		|
+		|	NOTE - each emitter is designed to either use an emit default OR an emit factor, 
+		|	not both. If trying to use both, only the most recently set will be considered.
+		|
+		|	RETURNS - emitter element (self)
+		
+	emit_factor([amount])
+	
+		|	sets the emit factor to the given amount (defaults to 1) and removes the emit defaults from the 
+		|	emitter. note that when the emit factor reduces the burst/stream amount below 1, it will convert 
+		|	the amount to a negative number so that the result is as expected (e.g. .5 => -2, .1 => -10,. etc)
+		|
+		|	NOTE - each emitter is designed to either use an emit default OR an emit factor, 
+		|	not both. If trying to use both, only the most recently set will be considered.
+		|
+		|	RETURNS - emitter element (self)
+
+	change_particle(PzParticle.p)
+	
+		|	changes the particle of the current emitter.
+		|
+		|	RETURNS - emitter element (self)
