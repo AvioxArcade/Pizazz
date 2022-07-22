@@ -12,4 +12,4 @@
 
 
 #macro __pizazz_option_autoUpdateDepth	true				//if the particle system depth should automatically be updated to the following formula when moved
-#macro __pizazz_depth_formula			-yMid				//yMid is the y coordinate of the element's base y value.
+#macro __pizazz_depth_formula			-(yMid)				//yMid is the y coordinate of the element's base y value.

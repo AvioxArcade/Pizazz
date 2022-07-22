@@ -84,7 +84,7 @@ PIZAZZ ELEMENT METHODS
 	The following methods can be called from the pizazz element. 
 	Each method that returns the pizazz element can be chained together, as shown in the examples above.
 		
-	add_emitter(PzParticle.p,[emit_default])	
+	.add_emitter(PzParticle.p,[emit_default])	
 	
 		|	adds an emitter to the pizazz struct at the default values set in pizazz_config. 
 		|	Optionally, you can pass in a custom emit default which will set both the
@@ -93,7 +93,7 @@ PIZAZZ ELEMENT METHODS
 		|		
 		|	RETURNS - new emitter element (so you can instantly call size/move/emit_defaults/etc. if needed)
 		
-	size(w,h,[ps_shape],[ps_distr], [resize_emitters])
+	.size(w,h,[ps_shape],[ps_distr], [resize_emitters])
 
 		|	set the default emitter size and shape for this pizazz struct.
 		|	if resize_emitters is true (default), also resizes all existing emitters to the 
@@ -101,55 +101,67 @@ PIZAZZ ELEMENT METHODS
 		|		
 		|	RETURNS - pizazz element (self)
 	
-	move(x,y,[z],[update_emitters],[update_depth])		
+	.move(x,y,[z],[update_emitters],[update_depth])		
 	
 		|	set the default emitter location to the given x,y,[z]
 		|	if update_emitters is true (default), also updates all emitter locations to 
 		|	the given location.
-		|	if update_depth is true (default), also sets the system's depth based on 
+		|	if update_depth is true (default set in config), also sets the system's depth based on 
 		|	the __pizazz_depth_formula macro found in pizazz_config. this default
-		|	can be changed with the macro __pizazz_option_autoUpdateDepth in pizazz_config
+		|	can be changed with the macro __pizazz_option_autoUpdateDepth in pizazz_config or on
+		|   a per-pizazz element basis with .set_depth()
 		|		
 		|	RETURNS - pizazz element (self)
 		
-	set_depth(depth)
+	.set_depth(depth, [auto_update])
 		
 		|	Sets the particle system depth to a specific value. Useful when you don't want depth to be 
 		|	automatically updated by move() or based on y position (default behavior)
+		|	with auto_update, you can optionally turn on(true) or off(false) auto depth updating. If not
+		|	provided, it won't be changed.
 		|
 		|	RETURNS - pizazz element (self
+		
+	.offsets([xOff],[yOff],[update_emitters])
 	
-	burst([amount])
+		|	Sets the default x offset and y offset of all emitters to the given values. 
+		|	If not provided, it leaves them as is.
+		|	if update_emitters is true (default), also updates all existing emitter locations to factor 
+		|	in the given offsets.
+		|	
+		|	RETURNS - pizazz element (self)
+	
+	.burst([amount])
 	
 		|	calls the burst() method of every emitter in this pizazz element.
 		|		
 		|	RETURNS - pizazz element (self)
 			
-	stream([amount])
+	.stream([amount])
 	
 		|	calls the stream() method of every emitter in this pizazz element.
 		|		
 		|	RETURNS - pizazz element (self)
 			
-	finish()
+	.finish()
 	
 		|	stops all emitters and destroys the particle system once all 
 		|	particles are gone.
 		|	
 		|	RETURNS - pizazz element (self)
 		
-	destroy()
+	.destroy()
 	
 		|	instantly destroys the particle system
 			
-	get_emitter_ind(ind)
+	.get_emitter_ind(ind)
 	
 		|	returns the given emitter struct, if it exists, based on creation order (emitter 
 		|	0 would be the first one added to the struct). else returns keyword noone.
 		|
 		|	RETURNS - emitter element OR keyword noone
 			
-	get_part_emitter(PzParticle.p)
+	.get_part_emitter(PzParticle.p)
 	
 		|	returns the first emitter found with the given PzParticle.p, if it exists. 
 		|	Otherwise, ruturns keyword noone.
@@ -163,7 +175,7 @@ PIZZAZ EMITTER ELEMENT METHODS
 	These methods can be used to modify emitter elements returned from 
 	add_emitter(), get_emitter_ind(), and get_part_emitter().
 	
-	size(w,h,[ps_shape],[ps_distr])
+	.size(w,h,[ps_shape],[ps_distr])
 	
 		|	resizes the current emitter to the given width and height.
 		|	Will also set the emitter shape and distrobution if provided. 
@@ -172,7 +184,7 @@ PIZZAZ EMITTER ELEMENT METHODS
 		|		
 		|	RETURNS - emitter element (self)
 			
-	move(x,y,[z])
+	.move(x,y,[z])
 	
 		|	moves this emitter to the given x,y,[z]
 		|	WARNING -  calling move() from the pizzaz element can override changes set on 
@@ -181,9 +193,18 @@ PIZZAZ EMITTER ELEMENT METHODS
 		|	individual emitters.
 		|		
 		|	RETURNS - emitter element (self)
+		
+	.offsets([xOff],[yOff])
+	
+		|	Sets the x offset and y offset of the emitter to the given values. Whenever the
+		|	pizazz system (or individual emitter) is moved, each emitter location will be adjusted 
+		|	by its offsets. 
+		|	if an argument is not provided, that offset is left unchanged.
+		|	
+		|	RETURNS - emitter element (self)
 	
 	
-	burst([amount])
+	.burst([amount])
 	
 		|	Bursts the amount of particles set by emit_defaults() or on emitter creation.
 		|	If an amount argument is provided, the emit default will be ignored and 
@@ -191,7 +212,7 @@ PIZZAZ EMITTER ELEMENT METHODS
 		|		
 		|	RETURNS - emitter element (self)
 			
-	stream([amount])
+	.stream([amount])
 	
 		|	Streams the amount of particles set by emit_defaults() or on emitter creation.
 		|	If an amount argument is provided, the emit default will be ignored and 
@@ -199,7 +220,7 @@ PIZZAZ EMITTER ELEMENT METHODS
 		|		
 		|	RETURNS - emitter element (self)
 
-	emit_defaults([burst_amount],[stream_amount])
+	.emit_defaults([burst_amount],[stream_amount])
 	
 		|	Sets separate burst or stream emit defaults, (rather than them being the same number as when 
 		|	creating the emitter) and removes any previously set emit factor.
@@ -209,7 +230,7 @@ PIZZAZ EMITTER ELEMENT METHODS
 		|
 		|	RETURNS - emitter element (self)
 		
-	emit_factor([amount])
+	.emit_factor([amount])
 	
 		|	sets the emit factor to the given amount (defaults to 1) and removes the emit defaults from the 
 		|	emitter. note that when the emit factor reduces the burst/stream amount below 1, it will convert 
@@ -220,7 +241,7 @@ PIZZAZ EMITTER ELEMENT METHODS
 		|
 		|	RETURNS - emitter element (self)
 
-	change_particle(PzParticle.p)
+	.change_particle(PzParticle.p)
 	
 		|	changes the particle of the current emitter.
 		|

@@ -1,6 +1,6 @@
 #region init
 
-	#macro __pizazz_version			"1.0.2 Alpha"
+	#macro __pizazz_version			"1.0.3 Alpha"
 	#macro __pizazz_version_date	"July 21, 2022"
 
 	__pizazz_echo("Welcome to Pizazz by LionArc! This is version" + __pizazz_version + " - " + __pizazz_version_date);
@@ -50,7 +50,11 @@
 		system = part_system_create();
 		xMid	= __pizazz_default_x;
 		yMid	= __pizazz_default_y;
+		xOff	= 0
+		yOff	= 0
 		z		= __pizazz_default_z;
+		autoUpdate_depth = __pizazz_option_autoUpdateDepth;
+		
 		height	= __pizazz_default_em_width;
 		width	= __pizazz_default_em_height;
 		shape	= __pizazz_default_em_shape;
@@ -80,6 +84,8 @@
 				
 				xMid			= parent.xMid;
 				yMid			= parent.yMid;
+				xOff			= parent.xOff;
+				yOff			= parent.yOff;
 				z				= parent.z;
 				
 				width = parent.width;
@@ -92,10 +98,11 @@
 				#region internal emitter methods
 				
 					static __update_region = function() {
-						var _yy = yMid-z
+						var _xx = (xMid+xOff)
+						var _yy = (yMid+yOff)-z
 						var _hw = width/2;
 						var _hh = height/2;
-						part_emitter_region(system,ind,xMid-_hw,xMid+_hw,_yy-_hw,_yy+_hw,shape,distr);
+						part_emitter_region(system,ind,_xx-_hw,_xx+_hw,_yy-_hw,_yy+_hw,shape,distr);
 					}
 					
 				#endregion
@@ -122,6 +129,14 @@
 						
 						__update_region();
 					
+						return self;
+					}
+				
+				
+					static offsets = function(_xOff = xOff ,_yOff = yOff) {
+						xOff = _xOff;
+						yOff = _yOff;
+						__update_region();
 						return self;
 					}
 				
@@ -207,7 +222,7 @@
 			return self;
 		}
 		
-		static move = function(_x=xMid,_y=yMid,_z=z, update_emitters=true, update_depth=__pizazz_option_autoUpdateDepth) {
+		static move = function(_x=xMid,_y=yMid,_z=z, update_emitters=true, update_depth=autoUpdate_depth) {
 			xMid = _x;
 			yMid = _y;
 			z = _z;
@@ -223,9 +238,8 @@
 					_emitter.xMid = xMid;
 					_emitter.yMid = yMid;
 					_emitter.z = z;
-					var _hw = width/2;
-					var _hh = height/2;
-					part_emitter_region(system,_emitter.ind,_ex-_hw,_ex+_hw,_ey-_hw,_ey+_hw,_emitter.shape,_emitter.distr);
+					
+					_emitter.__update_region()
 				}
 			}
 			
@@ -233,8 +247,24 @@
 			
 		}
 		
-		static set_depth = function(_depth){
+		static set_depth = function(_depth, auto_update = autoUpdate_depth){
 			__update_depth(_depth);
+			autoUpdate_depth = auto_update;
+			return self;
+		}
+		
+		static offsets = function(_xOff = xOff ,_yOff = yOff, update_emitters = true) {
+			xOff = _xOff;
+			yOff = _yOff;
+			if update_emitters {
+				for (var i = 0; i < emitter_qty; ++i) {
+				    var _emitter = emitter[i];
+					_emitter.xOff = xOff;
+					_emitter.yOff = yOff;
+					
+					_emitter.__update_region()
+				}
+			}
 			return self;
 		}
 		

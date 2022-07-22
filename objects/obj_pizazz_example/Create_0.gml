@@ -2,7 +2,7 @@
 
 //version 1
 fire_trail = create_pizazz(PzParticle.fire,3)
-fire_trail.add_emitter(PzParticle.fire_spark,-10);
+fire_trail.add_emitter(PzParticle.fire_spark,-10).offsets(0,-10)
 fire_trail.move(mouse_x,mouse_y).stream();
 //*/
 
