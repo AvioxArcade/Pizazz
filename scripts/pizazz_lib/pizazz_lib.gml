@@ -1,7 +1,7 @@
 #region init
 
 	#macro __pizazz_version			"1.0.3 Alpha"
-	#macro __pizazz_version_date	"July 21, 2022"
+	#macro __pizazz_version_date	"July 22, 2022"
 
 	__pizazz_echo("Welcome to Pizazz by LionArc! This is version" + __pizazz_version + " - " + __pizazz_version_date);
 
