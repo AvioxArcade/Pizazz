@@ -8,8 +8,8 @@ variables inside struct elements to simplify what you need to provide for each i
 The only major setup required is creating/defining your particles in pizazz_particles.
 Afterward, Pizazz can use those particles and assign them to particle systems and emitters as requested.
 
-### [Download the YYPMS](https://github.com/AvioxArcade/Pizazz/releases)
-### [Pizazz Wiki](https://github.com/AvioxArcade/Pizazz/wiki)
+- ### [Download the YYPMS](https://github.com/AvioxArcade/Pizazz/releases)
+- ### [View the Pizazz Wiki](https://github.com/AvioxArcade/Pizazz/wiki)
 
 ## Quickstart
 Traditionally, to create a particle system and immediately use them, your code would look something like this:
