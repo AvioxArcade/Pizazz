@@ -35,8 +35,6 @@ global.__PizzazPart[PzParticle.fire_spark] = p;
 
 
 
-
-
 function __pizzaz_get_particle(p){
 	///@arg Particle.p
 	return global.__PizzazPart[p];	
