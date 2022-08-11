@@ -1,6 +1,7 @@
 {
   "resources": [
     {"id":{"name":"pizazz_particles","path":"scripts/pizazz_particles/pizazz_particles.yy",},"order":3,},
+    {"id":{"name":"DevNotes","path":"notes/DevNotes/DevNotes.yy",},"order":4,},
     {"id":{"name":"pizazz_config","path":"scripts/pizazz_config/pizazz_config.yy",},"order":0,},
     {"id":{"name":"pizazz_lib","path":"scripts/pizazz_lib/pizazz_lib.yy",},"order":2,},
     {"id":{"name":"pizazz_documentation","path":"notes/pizazz_documentation/pizazz_documentation.yy",},"order":1,},

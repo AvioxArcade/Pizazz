@@ -1,15 +1,18 @@
 #region init
-
+	
 	#macro __pizazz_version			"1.0.3 Alpha"
 	#macro __pizazz_version_date	"July 22, 2022"
-
+	
+	if (!variable_global_exists("__pizazz_particles")) global.__pizazz_particles = ds_map_create();
+	
 	__pizazz_echo("Welcome to Pizazz by LionArc! This is version" + __pizazz_version + " - " + __pizazz_version_date);
 
+	
 #endregion
 
 #region public functions
 
-	function create_pizazz(_particle=noone, _emit_default = __pizazz_emit_default){
+	function pizazz_create(_particle=noone, _emit_default = __pizazz_emit_default){
 		///@arg PzParticle.p
 		///@arg [emit_default]
 		var struct = new __pizazz_element()
@@ -19,10 +22,24 @@
 			
 		return struct
 	}
+	
+	function pizazz_add_particle(particle_ind, key) {
+		key = string(key);
+		if ds_exists(global.__pizazz_particles,ds_type_map)
+			ds_map_add(global.__pizazz_particles,key,particle_ind)
+	}
 
 #endregion
 
 #region private functions
+
+	function __pizzaz_get_particle(key){
+		///@arg Particle.p
+		key = string(key)
+		var part = ds_map_find_value(global.__pizazz_particles,key)
+		if is_undefined(part) part = noone;
+		return part;
+	}
 
 	function __pizazz_echo()
 	{
@@ -48,8 +65,8 @@
 
 	function __pizazz_element() constructor {
 		system = part_system_create();
-		xMid	= __pizazz_default_x;
-		yMid	= __pizazz_default_y;
+		x	= __pizazz_default_x;
+		y	= __pizazz_default_y;
 		xOff	= 0
 		yOff	= 0
 		z		= __pizazz_default_z;
@@ -82,8 +99,8 @@
 				default_burst	= _emit_default;
 				default_stream	= _emit_default;
 				
-				xMid			= parent.xMid;
-				yMid			= parent.yMid;
+				x			= parent.x;
+				y			= parent.y;
 				xOff			= parent.xOff;
 				yOff			= parent.yOff;
 				z				= parent.z;
@@ -98,8 +115,8 @@
 				#region internal emitter methods
 				
 					static __update_region = function() {
-						var _xx = (xMid+xOff)
-						var _yy = (yMid+yOff)-z
+						var _xx = (x+xOff)
+						var _yy = (y+yOff)-z
 						var _hw = width/2;
 						var _hh = height/2;
 						part_emitter_region(system,ind,_xx-_hw,_xx+_hw,_yy-_hw,_yy+_hw,shape,distr);
@@ -121,10 +138,10 @@
 						return self;
 					}
 				
-					static move = function(_x=xMid,_y=yMid,_z=z){
+					static move = function(_x=x,_y=y,_z=z){
 					
-						xMid = _x;
-						yMid = _y;
+						x = _x;
+						y = _y;
 						z = _z;
 						
 						__update_region();
@@ -147,16 +164,13 @@
 				
 					static burst = function(_amount=default_burst){
 						
-						if default_burst == 0 { //using emit_factor instead of defaults
-							if _amount == 0
-								__pizazz_echo(
-									"Warning. trying to burst 0 particles from an emitter. ",
-									"Make sure emit standards are set correctly."
-								)
-							_amount = _amount >= 0 ? _amount*emitter_factor : _amount/emitter_factor
-							if _amount < 1 && _amount > 0
-								_amount = -(1/_amount)
-						}
+						//calculate emit factor
+						_amount = _amount >= 0 ? _amount*emitter_factor : _amount/emitter_factor
+						
+						//fractions to negatives
+						if _amount < 1 && _amount > 0
+							_amount = -(1/_amount)
+						
 						
 						part_emitter_burst(system,ind,particle,_amount)	
 						return self;
@@ -164,11 +178,14 @@
 				
 					static stream = function(_amount=default_stream){
 						
-						if default_stream == 0 {
-							_amount = _amount >= 0 ? _amount*emitter_factor : _amount/emitter_factor
-							if _amount < 1 && _amount > 0
-								_amount = -(1/_amount)
-						}
+						
+						//calculate emit factor
+						_amount = _amount >= 0 ? _amount*emitter_factor : _amount/emitter_factor
+						
+						//fractions to negatives
+						
+						if _amount < 1 && _amount > 0
+							_amount = -(1/_amount)
 												
 						part_emitter_stream(system,ind,particle,_amount)	
 						return self;
@@ -177,14 +194,11 @@
 					static emit_defaults = function(_burst_amount=default_burst,_stream_amount=default_stream){
 						default_burst = _burst_amount;
 						default_stream = _stream_amount;
-						emitter_factor = 1;
 						return self
 					}
 					
 					static emit_factor = function(_factor = 1){
 						emitter_factor = _factor;
-						default_burst = 0;
-						default_stream = 0;
 						return self;
 					}
 					
@@ -222,21 +236,21 @@
 			return self;
 		}
 		
-		static move = function(_x=xMid,_y=yMid,_z=z, update_emitters=true, update_depth=autoUpdate_depth) {
-			xMid = _x;
-			yMid = _y;
+		static move = function(_x=x,_y=y,_z=z, update_emitters=true, update_depth=autoUpdate_depth) {
+			x = _x;
+			y = _y;
 			z = _z;
 			
 			if (update_depth)
 				__update_depth();
 			
 			if update_emitters {
-				var _ex = xMid;
-				var _ey = yMid - z;
+				var _ex = x;
+				var _ey = y - z;
 				for (var i = 0; i < emitter_qty; ++i) {
 				    var _emitter = emitter[i];
-					_emitter.xMid = xMid;
-					_emitter.yMid = yMid;
+					_emitter.x = x;
+					_emitter.y = y;
 					_emitter.z = z;
 					
 					_emitter.__update_region()
