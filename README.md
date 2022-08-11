@@ -46,4 +46,4 @@ effects are possible in just one line of code:
 create_pizazz(PzParticle.fire).move(x,y).burst(10).finish();
 ```
 
-For more information on using Pizazz, please check out the [the Wiki](https://github.com/AvioxArcade/Pizazz/wiki)
+For more information on using Pizazz, please check out the [the Wiki](https://github.com/AvioxArcade/Pizazz/wiki) or the [Quick Start Guide](https://github.com/AvioxArcade/Pizazz/wiki/Quick-Start-Guide)
