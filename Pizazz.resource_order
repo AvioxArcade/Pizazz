@@ -1,0 +1,13 @@
+{
+  "FolderOrderSettings": [
+    {"name":"pizazz example","order":6,"path":"folders/pizazz example.yy",},
+  ],
+  "ResourceOrderSettings": [
+    {"name":"pizazz_particles","order":3,"path":"scripts/pizazz_particles/pizazz_particles.yy",},
+    {"name":"DevNotes","order":4,"path":"notes/DevNotes/DevNotes.yy",},
+    {"name":"pizazz_lib","order":2,"path":"scripts/pizazz_lib/pizazz_lib.yy",},
+    {"name":"ParticleSystem1","order":7,"path":"particles/ParticleSystem1/ParticleSystem1.yy",},
+    {"name":"pizazz_documentation","order":1,"path":"notes/pizazz_documentation/pizazz_documentation.yy",},
+    {"name":"rm_pizazz_example","order":1,"path":"rooms/rm_pizazz_example/rm_pizazz_example.yy",},
+  ],
+}

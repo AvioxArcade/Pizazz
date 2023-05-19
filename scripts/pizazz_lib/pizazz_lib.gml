@@ -1,7 +1,7 @@
 #region init
 	
-	#macro __pizazz_version			"1.0.3 Alpha"
-	#macro __pizazz_version_date	"July 22, 2022"
+	#macro __pizazz_version			"1.1 Alpha"
+	#macro __pizazz_version_date	"May 19, 2023"
 	
 	if (!variable_global_exists("__pizazz_particles")) global.__pizazz_particles = ds_map_create();
 	
@@ -12,7 +12,11 @@
 
 #region public functions
 
-	function pizazz_create(_particle=noone, _emit_default = __pizazz_emit_default){
+	function pizazz_exists(ind){
+		return is_struct(ind)	
+	}
+
+	function create_pizazz(_particle=noone, _emit_default = __pizazz_emit_default){
 		///@arg PzParticle.p
 		///@arg [emit_default]
 		var struct = new __pizazz_element()
@@ -22,6 +26,10 @@
 			
 		return struct
 	}
+	
+	//function create_pizazz_from_asset(_asset_id) {
+		
+	//}
 	
 	function pizazz_add_particle(particle_ind, key) {
 		key = string(key);
@@ -65,8 +73,8 @@
 
 	function __pizazz_element() constructor {
 		system = part_system_create();
-		x	= __pizazz_default_x;
-		y	= __pizazz_default_y;
+		xMid	= __pizazz_default_x;
+		yMid	= __pizazz_default_y;
 		xOff	= 0
 		yOff	= 0
 		z		= __pizazz_default_z;
@@ -79,6 +87,8 @@
 		emitter = []
 		emitter_qty = 0;
 		time_source = noone;
+		
+		active = true; //finishing an effect sets this to false and prevents any further stream/emit commands
 		
 		__update_depth();
 		
@@ -99,8 +109,8 @@
 				default_burst	= _emit_default;
 				default_stream	= _emit_default;
 				
-				x			= parent.x;
-				y			= parent.y;
+				xMid			= parent.xMid;
+				yMid			= parent.yMid;
 				xOff			= parent.xOff;
 				yOff			= parent.yOff;
 				z				= parent.z;
@@ -115,11 +125,11 @@
 				#region internal emitter methods
 				
 					static __update_region = function() {
-						var _xx = (x+xOff)
-						var _yy = (y+yOff)-z
+						var _xx = (xMid+xOff)
+						var _yy = (yMid+yOff)-z
 						var _hw = width/2;
 						var _hh = height/2;
-						part_emitter_region(system,ind,_xx-_hw,_xx+_hw,_yy-_hw,_yy+_hw,shape,distr);
+						part_emitter_region(system,ind,_xx-_hw,_xx+_hw,_yy-_hh,_yy+_hh,shape,distr);
 					}
 					
 				#endregion
@@ -137,11 +147,26 @@
 					
 						return self;
 					}
-				
-					static move = function(_x=x,_y=y,_z=z){
 					
-						x = _x;
-						y = _y;
+					static line = function(_x1,_y1,_x2,_y2, _distr = distr){
+						shape = ps_shape_line;
+						distr = _distr;
+						height=	_y2-_y1;
+						width = _x2-_x1;
+						
+						xMid = lerp(_x1,_x2,.5);
+						yMid = lerp(_y1,_y2,.5);
+						z = 0;
+						
+						__update_region();
+						
+						return self
+					}
+				
+					static move = function(_x=xMid,_y=yMid,_z=z){
+					
+						xMid = _x;
+						yMid = _y;
 						z = _z;
 						
 						__update_region();
@@ -164,14 +189,18 @@
 				
 					static burst = function(_amount=default_burst){
 						
-						//calculate emit factor
-						_amount = _amount >= 0 ? _amount*emitter_factor : _amount/emitter_factor
-						
-						//fractions to negatives
-						if _amount < 1 && _amount > 0
-							_amount = -(1/_amount)
-						
-						
+						if default_burst == 0 { //using emit_factor instead of defaults
+							if _amount == 0
+								__pizazz_echo(
+									"Warning. trying to burst 0 particles from an emitter. ",
+									"Make sure emit standards are set correctly."
+								)
+							//calculate emit factor
+							_amount = _amount >= 0 ? _amount*emitter_factor : _amount/emitter_factor
+							//fractions to negatives
+							if _amount < 1 && _amount > 0
+								_amount = -(1/_amount)
+						}
 						part_emitter_burst(system,ind,particle,_amount)	
 						return self;
 					}
@@ -179,26 +208,30 @@
 					static stream = function(_amount=default_stream){
 						
 						
-						//calculate emit factor
-						_amount = _amount >= 0 ? _amount*emitter_factor : _amount/emitter_factor
-						
-						//fractions to negatives
-						
-						if _amount < 1 && _amount > 0
-							_amount = -(1/_amount)
+						if default_stream == 0 {
+							//calculate emit factor
+							_amount = _amount >= 0 ? _amount*emitter_factor : _amount/emitter_factor
+							
+							//fractions to negatives
+							if _amount < 1 && _amount > 0
+								_amount = -(1/_amount)
+						}
 												
 						part_emitter_stream(system,ind,particle,_amount)	
 						return self;
 					}
 					
 					static emit_defaults = function(_burst_amount=default_burst,_stream_amount=default_stream){
-						default_burst = _burst_amount;
-						default_stream = _stream_amount;
+						default_burst	= _burst_amount;
+						default_stream	= _stream_amount;
+						emitter_factor	= 1;
 						return self
 					}
 					
 					static emit_factor = function(_factor = 1){
-						emitter_factor = _factor;
+						emitter_factor	= _factor;
+						default_burst	= 0;
+						default_stream	= 0;
 						return self;
 					}
 					
@@ -217,40 +250,44 @@
 		}
 		
 		static burst = function(amount=undefined){
-			for (var i = 0; i < emitter_qty; ++i) {
-			    var _emitter = emitter[i]
-				if is_undefined(amount)
-					_emitter.burst();
-				else _emitter.burst(amount);
+			if (active){
+				for (var i = 0; i < emitter_qty; ++i) {
+				    var _emitter = emitter[i]
+					if is_undefined(amount)
+						_emitter.burst();
+					else _emitter.burst(amount);
+				}
 			}
 			return self;
 		}
 		
 		static stream = function(amount) {
-			for (var i = 0; i < emitter_qty; ++i) {
-			    var _emitter = emitter[i]
-				if is_undefined(amount)
-					_emitter.stream();
-				else _emitter.stream(amount);
+			if (active){
+				for (var i = 0; i < emitter_qty; ++i) {
+				    var _emitter = emitter[i]
+					if is_undefined(amount)
+						_emitter.stream();
+					else _emitter.stream(amount);
+				}
 			}
 			return self;
 		}
 		
-		static move = function(_x=x,_y=y,_z=z, update_emitters=true, update_depth=autoUpdate_depth) {
-			x = _x;
-			y = _y;
+		static move = function(_x=xMid,_y=yMid,_z=z, update_emitters=true, update_depth=autoUpdate_depth) {
+			xMid = _x;
+			yMid = _y;
 			z = _z;
 			
 			if (update_depth)
 				__update_depth();
 			
 			if update_emitters {
-				var _ex = x;
-				var _ey = y - z;
+				var _ex = xMid;
+				var _ey = yMid - z;
 				for (var i = 0; i < emitter_qty; ++i) {
 				    var _emitter = emitter[i];
-					_emitter.x = x;
-					_emitter.y = y;
+					_emitter.xMid = xMid;
+					_emitter.yMid = yMid;
 					_emitter.z = z;
 					
 					_emitter.__update_region()
@@ -299,6 +336,27 @@
 			return self;
 		}
 		
+		static line = function(_x1,_y1,_x2,_y2, _distr = distr, _override = true){
+			
+			shape = ps_shape_line;
+			distr = _distr;
+			height=	_y2-_y1;
+			width = _x2-_x1;
+						
+			xMid = lerp(_x1,_x2,.5);
+			yMid = lerp(_y1,_y2,.5);
+			z = 0;
+						
+			if _override {
+				for (var i = 0; i < emitter_qty; ++i) {
+					var _emitter = emitter[i];
+					_emitter.line(_x1,_y1,_x2,_y2,_distr)
+				}
+			}
+						
+			return self
+		}
+		
 		static finish = function() {
 			//stops all emitters, once all particles are gone, destroys the effect.
 			if time_source == noone {
@@ -312,6 +370,8 @@
 				time_source = time_source_create(time_source_global,1,time_source_units_frames,killcheck,[],-1)
 			
 				stream(0);
+				
+				active = false;
 			
 				time_source_start(time_source);
 			} else __pizazz_echo("Trying to kill an effect that's already in process of being killed")

@@ -4,6 +4,10 @@
 ///	and set up your particles elsewhere.
 
 
+enum PzParticle{
+	fire, fire_ember,
+}
+
 //Create a particles map if we don't already have one
 //We have to do this in case another system function is executed before this one
 if (!variable_global_exists("__pizazz_particles")) global.__pizazz_particles = ds_map_create();

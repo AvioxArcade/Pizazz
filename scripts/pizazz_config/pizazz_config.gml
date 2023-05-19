@@ -12,10 +12,5 @@
 #macro __pizazz_emit_default			1					//the default burst/stream amount for each emitter if an amount isn't provided.
 
 #macro __pizazz_option_autoUpdateDepth	true				//default setting for if a pizazz element's depth should automatically be updated when moved
-#macro __pizazz_depth_formula			-(y+yOff)			//the calculation used to update a pizazz element's depth. (in case your game is using something different)
-
-
-//enumeration for PzParticle (not required)
-enum PzParticle{
-	fire, fire_ember,
-}
+#macro __pizazz_depth_formula			-(yMid+yOff)		//the calculation used to update a pizazz element's depth. 'yMid' is the middle of the emitter region
+															// (in case your game is using something other than 'depth = -y')

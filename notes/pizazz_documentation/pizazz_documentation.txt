@@ -77,6 +77,16 @@ FUNCTIONS
 		|	
 		|	RETURNS - Pizazz element
 	
+	pizazz_exists(element_id)
+	
+		|	used to see if a pizazz element exists
+		|
+		|	RETURNS - Boolean
+		
+	pizazz_add_particle(particle_id, key)
+	
+		|	adds a particle type to the pizazz system that can be referenced by the given key.
+		|	pass in the particle ID returned when using 'part_type_create()'
 	
 
 PIZAZZ ELEMENT METHODS
@@ -96,11 +106,27 @@ PIZAZZ ELEMENT METHODS
 	.size(w,h,[ps_shape],[ps_distr], [resize_emitters])
 
 		|	set the default emitter size and shape for this pizazz struct.
-		|	if resize_emitters is true (default), also resizes all existing emitters to the 
-		|	given width and height, and shape and distrobution if provided.
+		|	if resize_emitters is true (default), this will also resizes all existing emitters 
+		|	to the given parameters.
+		|
+		|	NOTE - if using distrobution 'ps_distr_line', using method .line() is suggested, 
+		|	or your results my be inconsistent
 		|		
 		|	RETURNS - pizazz element (self)
-	
+		
+	.line(x1,y1,x2,y2,[ps_distr], [resize_emitters])
+		
+		|	set the default emitter shape to ps_distr_line with a line travelling from (x1,y1)
+		|	to (x2,y2). Replaces need for .size() and .move(), since ps_shape_line uses emitter 
+		|	regions differently.
+		|	if resize_emitters is true (default), this will also resizes all existing emitters 
+		|	to the given parameters.
+		|
+		|	NOTE - to move the line, instead of using .move() to move the line, consider calling 
+		|	.line() again or using .offsets() to shift the line.
+		|
+		|	RETURNS - pizzaz element (self)
+		
 	.move(x,y,[z],[update_emitters],[update_depth])		
 	
 		|	set the default emitter location to the given x,y,[z]
@@ -173,20 +199,40 @@ PIZAZZ ELEMENT METHODS
 PIZZAZ EMITTER ELEMENT METHODS
 	
 	These methods can be used to modify emitter elements returned from 
-	add_emitter(), get_emitter_ind(), and get_part_emitter().
+	add_emitter(), get_emitter_ind(), and get_part_emitter(). Many of them are similar to the
+	above methods, but are intended to change just one emitter rather than the whole pizzaz element
 	
 	.size(w,h,[ps_shape],[ps_distr])
 	
 		|	resizes the current emitter to the given width and height.
 		|	Will also set the emitter shape and distrobution if provided. 
-		|	WARNING -  calling size() from the pizzaz element can override changes set on 
+		|
+		|	NOTE - if using the ps_shape_line shape, using method .line() is suggested, 
+		|	or your results my be inconsistent
+		|
+		|	WARNING -  calling .size() from the pizzaz element can override changes set here on 
 		|	a per-emitter basis
 		|		
 		|	RETURNS - emitter element (self)
+		
+	.line(x1,y1,x2,y2,[ps_distr])
+		
+		|	set the current emitter shape to ps_distr_line with a line travelling from (x1,y1)
+		|	to (x2,y2). Replaces need for .size() and .move(), since ps_shape_line uses emitter 
+		|	regions differently.
+		|
+		|	NOTE - to move the line, instead of using .move() to move the line, consider calling 
+		|	.line() again or using .offsets() to shift the line.
+		|
+		|	WARNING -  calling .line() from the pizzaz element can override changes set here on 
+		|	a per-emitter basis
+		|
+		|	RETURNS - pizzaz element (self)
 			
 	.move(x,y,[z])
 	
 		|	moves this emitter to the given x,y,[z]
+		|	
 		|	WARNING -  calling move() from the pizzaz element can override changes set on 
 		|	a per-emitter basis, including the system's depth value. to set a system depth 
 		|	with varied emitter locations, set the pizazz element location before changing
