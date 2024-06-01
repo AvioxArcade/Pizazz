@@ -1,6 +1,6 @@
 # ✨ Pizazz ✨
 
-**Pizazz** is a library/wrapper for working with GM's built-in particle systems.
+**Pizazz** is a Wrapper Library for working with GM's built-in particle systems.
 
 It simplifies working with basic paricle systems by storing relevant data in structs and dynamically doing a lot of work for you.
 
