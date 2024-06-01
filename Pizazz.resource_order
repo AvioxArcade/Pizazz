@@ -1,13 +1,15 @@
 {
-  "FolderOrderSettings": [
+  "FolderOrderSettings":[
     {"name":"pizazz example","order":6,"path":"folders/pizazz example.yy",},
   ],
-  "ResourceOrderSettings": [
-    {"name":"pizazz_particles","order":3,"path":"scripts/pizazz_particles/pizazz_particles.yy",},
+  "ResourceOrderSettings":[
     {"name":"DevNotes","order":4,"path":"notes/DevNotes/DevNotes.yy",},
-    {"name":"pizazz_lib","order":2,"path":"scripts/pizazz_lib/pizazz_lib.yy",},
-    {"name":"ParticleSystem1","order":7,"path":"particles/ParticleSystem1/ParticleSystem1.yy",},
     {"name":"pizazz_documentation","order":1,"path":"notes/pizazz_documentation/pizazz_documentation.yy",},
+    {"name":"ps_warp","order":2,"path":"particles/ps_warp/ps_warp.yy",},
     {"name":"rm_pizazz_example","order":1,"path":"rooms/rm_pizazz_example/rm_pizazz_example.yy",},
+    {"name":"pizazz_lib","order":2,"path":"scripts/pizazz_lib/pizazz_lib.yy",},
+    {"name":"pizazz_particles","order":3,"path":"scripts/pizazz_particles/pizazz_particles.yy",},
+    {"name":"GM_Electricity_spr_Electricity1","order":3,"path":"sprites/GM_Electricity_spr_Electricity1/GM_Electricity_spr_Electricity1.yy",},
+    {"name":"GM_FlameIntensity_spr_Fire","order":4,"path":"sprites/GM_FlameIntensity_spr_Fire/GM_FlameIntensity_spr_Fire.yy",},
   ],
 }

@@ -168,7 +168,13 @@ PIZAZZ ELEMENT METHODS
 		|	calls the stream() method of every emitter in this pizazz element.
 		|		
 		|	RETURNS - pizazz element (self)
-			
+
+	.pause_resume()
+	
+		|	calls the pause_resume() method of every emitter in this pizazz element.
+		|		
+		|	RETURNS - pizazz element (self)
+
 	.finish()
 	
 		|	stops all emitters and destroys the particle system once all 
@@ -263,6 +269,15 @@ PIZZAZ EMITTER ELEMENT METHODS
 		|	Streams the amount of particles set by emit_defaults() or on emitter creation.
 		|	If an amount argument is provided, the emit default will be ignored and 
 		|	the emitter will stream the given amount, adjusted by the emit factor (if set)
+		|		
+		|	RETURNS - emitter element (self)
+		
+	.pause_resume()
+	
+		|	If the emitter is streaming, it pauses it. 
+		|	If the emitter is paused, it resumes streaming.
+		|	
+		|	NOTE - pausing an emitter then calling stream() overrides any paused state.
 		|		
 		|	RETURNS - emitter element (self)
 

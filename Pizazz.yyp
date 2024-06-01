@@ -1,40 +1,45 @@
 {
-  "resourceType": "GMProject",
-  "resourceVersion": "1.7",
-  "name": "Pizazz",
-  "AudioGroups": [
-    {"resourceType":"GMAudioGroup","resourceVersion":"1.3","name":"audiogroup_default","targets":-1,},
+  "$GMProject":"",
+  "%Name":"Pizazz",
+  "AudioGroups":[
+    {"$GMAudioGroup":"","%Name":"audiogroup_default","name":"audiogroup_default","resourceType":"GMAudioGroup","resourceVersion":"2.0","targets":-1,},
   ],
-  "configs": {
-    "children": [],
-    "name": "Default",
+  "configs":{
+    "children":[],
+    "name":"Default",
   },
-  "defaultScriptType": 1,
-  "Folders": [
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Libraries","folderPath":"folders/Libraries.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Pizazz","folderPath":"folders/Libraries/Pizazz.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"pizazz example","folderPath":"folders/pizazz example.yy",},
+  "defaultScriptType":1,
+  "Folders":[
+    {"$GMFolder":"","%Name":"Libraries","folderPath":"folders/Libraries.yy","name":"Libraries","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Pizazz","folderPath":"folders/Libraries/Pizazz.yy","name":"Pizazz","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"pizazz example","folderPath":"folders/pizazz example.yy","name":"pizazz example","resourceType":"GMFolder","resourceVersion":"2.0",},
   ],
-  "IncludedFiles": [],
-  "isEcma": false,
-  "LibraryEmitters": [],
-  "MetaData": {
-    "IDEVersion": "2023.2.1.75",
+  "IncludedFiles":[],
+  "isEcma":false,
+  "LibraryEmitters":[],
+  "MetaData":{
+    "IDEVersion":"2024.4.1.152",
   },
-  "resources": [
-    {"id":{"name":"pizazz_particles","path":"scripts/pizazz_particles/pizazz_particles.yy",},},
+  "name":"Pizazz",
+  "resources":[
     {"id":{"name":"DevNotes","path":"notes/DevNotes/DevNotes.yy",},},
-    {"id":{"name":"pizazz_config","path":"scripts/pizazz_config/pizazz_config.yy",},},
-    {"id":{"name":"pizazz_lib","path":"scripts/pizazz_lib/pizazz_lib.yy",},},
-    {"id":{"name":"ParticleSystem1","path":"particles/ParticleSystem1/ParticleSystem1.yy",},},
     {"id":{"name":"pizazz_documentation","path":"notes/pizazz_documentation/pizazz_documentation.yy",},},
     {"id":{"name":"obj_pizazz_example","path":"objects/obj_pizazz_example/obj_pizazz_example.yy",},},
+    {"id":{"name":"ps_warp","path":"particles/ps_warp/ps_warp.yy",},},
     {"id":{"name":"rm_pizazz_example","path":"rooms/rm_pizazz_example/rm_pizazz_example.yy",},},
+    {"id":{"name":"pizazz_config","path":"scripts/pizazz_config/pizazz_config.yy",},},
+    {"id":{"name":"pizazz_lib","path":"scripts/pizazz_lib/pizazz_lib.yy",},},
+    {"id":{"name":"pizazz_particles","path":"scripts/pizazz_particles/pizazz_particles.yy",},},
+    {"id":{"name":"GM_Electricity_spr_Electricity1","path":"sprites/GM_Electricity_spr_Electricity1/GM_Electricity_spr_Electricity1.yy",},},
+    {"id":{"name":"GM_FlameIntensity_spr_Fire","path":"sprites/GM_FlameIntensity_spr_Fire/GM_FlameIntensity_spr_Fire.yy",},},
   ],
-  "RoomOrderNodes": [
+  "resourceType":"GMProject",
+  "resourceVersion":"2.0",
+  "RoomOrderNodes":[
     {"roomId":{"name":"rm_pizazz_example","path":"rooms/rm_pizazz_example/rm_pizazz_example.yy",},},
   ],
-  "TextureGroups": [
-    {"resourceType":"GMTextureGroup","resourceVersion":"1.3","name":"Default","autocrop":true,"border":2,"compressFormat":"bz2","directory":"","groupParent":null,"isScaled":true,"loadType":"default","mipsToGenerate":0,"targets":-1,},
+  "templateType":null,
+  "TextureGroups":[
+    {"$GMTextureGroup":"","%Name":"Default","autocrop":true,"border":2,"compressFormat":"bz2","customOptions":"","directory":"","groupParent":null,"isScaled":true,"loadType":"default","mipsToGenerate":0,"name":"Default","resourceType":"GMTextureGroup","resourceVersion":"2.0","targets":-1,},
   ],
 }

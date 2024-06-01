@@ -1,11 +1,12 @@
 
 # DEV NOTES #
 
-Additional Ideas:
+Additional Library Ideas:
+
+- import Particle System Assets?
 
 - pizazz_add_template()			Creates a globally accessible Pizazz template element from an existing Pizazz element. (flag to auto destroy?)
 - pizazz_from_template()		Creates a Pizazz element from aPpizazz template element.
 - pizazz_duplicate()			Duplicates an existing pizazz element 
-
 
  - test more complicated particle systems (attractors, repellers, secondary particles, etc)

@@ -1,7 +1,7 @@
 #region init
 	
-	#macro __pizazz_version			"1.1 Alpha"
-	#macro __pizazz_version_date	"May 19, 2023"
+	#macro __pizazz_version			"1.1.1 Alpha"
+	#macro __pizazz_version_date	"June 1, 2024"
 	
 	if (!variable_global_exists("__pizazz_particles")) global.__pizazz_particles = ds_map_create();
 	
@@ -13,23 +13,27 @@
 #region public functions
 
 	function pizazz_exists(ind){
-		return is_struct(ind)	
+		return is_struct(ind) && part_system_exists(ind[$ "system"])
 	}
 
-	function create_pizazz(_particle=noone, _emit_default = __pizazz_emit_default){
+	//NOTE - please see `pizazz_documentation` for assistance
+	//NOTE - please see `pizazz_config` for config & default values
+	
+	function create_pizazz(_particle=undefined, _emit_default = __pizazz_emit_default){
 		///@arg PzParticle.p
 		///@arg [emit_default]
 		var struct = new __pizazz_element()
 		
-		if _particle != noone
+		if particle_exists(_particle){
+			//this is a particle system asset. import the data.
+			var _info = particle_get_info(_particle)
+			///TODO - actually import it.
+			
+		} else if _particle != undefined
 			struct.add_emitter(_particle, _emit_default)
 			
 		return struct
 	}
-	
-	//function create_pizazz_from_asset(_asset_id) {
-		
-	//}
 	
 	function pizazz_add_particle(particle_ind, key) {
 		key = string(key);
@@ -108,6 +112,8 @@
 				emitter_factor	= 1;
 				default_burst	= _emit_default;
 				default_stream	= _emit_default;
+				current_stream	= 0;
+				stream_paused	= false;
 				
 				xMid			= parent.xMid;
 				yMid			= parent.yMid;
@@ -130,6 +136,7 @@
 						var _hw = width/2;
 						var _hh = height/2;
 						part_emitter_region(system,ind,_xx-_hw,_xx+_hw,_yy-_hh,_yy+_hh,shape,distr);
+
 					}
 					
 				#endregion
@@ -188,7 +195,6 @@
 					}
 				
 					static burst = function(_amount=default_burst){
-						
 						if default_burst == 0 { //using emit_factor instead of defaults
 							if _amount == 0
 								__pizazz_echo(
@@ -202,12 +208,12 @@
 								_amount = -(1/_amount)
 						}
 						part_emitter_burst(system,ind,particle,_amount)	
+
 						return self;
 					}
 				
 					static stream = function(_amount=default_stream){
-						
-						
+
 						if default_stream == 0 {
 							//calculate emit factor
 							_amount = _amount >= 0 ? _amount*emitter_factor : _amount/emitter_factor
@@ -216,9 +222,24 @@
 							if _amount < 1 && _amount > 0
 								_amount = -(1/_amount)
 						}
-												
-						part_emitter_stream(system,ind,particle,_amount)	
+						current_stream = _amount;
+						stream_paused = false;
+						part_emitter_stream(system,ind,particle,_amount)
+
 						return self;
+					}
+					
+					static pause_resume = function(){
+						if (stream_paused){
+							if (current_stream == 0)
+								__pizazz_echo("Warning: trying to resume emitter stream of 0");
+							part_emitter_stream(system,ind,particle,current_stream);
+							stream_paused = false;
+						} else {
+							stream_paused = true;
+							part_emitter_stream(system,ind,particle,0);
+						}
+						return self
 					}
 					
 					static emit_defaults = function(_burst_amount=default_burst,_stream_amount=default_stream){
@@ -268,6 +289,15 @@
 					if is_undefined(amount)
 						_emitter.stream();
 					else _emitter.stream(amount);
+				}
+			}
+			return self;
+		}
+		
+		static pause_resume = function(){
+			if (active){
+				for (var i = 0; i < emitter_qty; ++i) {
+					emitter[i].pause_resume();
 				}
 			}
 			return self;
@@ -381,10 +411,12 @@
 		
 		static destroy = function(){
 			//instantly destroys effect, regardless of particles existing or not
-			part_system_destroy(system);
-			for (var i = 0; i < emitter_qty; ++i) {
-				var _emitter = emitter[i]
-			    delete _emitter;
+			if part_system_exists(system){
+				part_system_destroy(system);
+				for (var i = 0; i < emitter_qty; ++i) {
+					var _emitter = emitter[i]
+				    delete _emitter;
+				}
 			}
 			var me = self;
 			delete me;

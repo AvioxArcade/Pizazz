@@ -1,9 +1,11 @@
 {
-  "resourceType": "GMNotes",
-  "resourceVersion": "1.1",
-  "name": "pizazz_documentation",
-  "parent": {
-    "name": "Pizazz",
-    "path": "folders/Libraries/Pizazz.yy",
+  "$GMNotes":"",
+  "%Name":"pizazz_documentation",
+  "name":"pizazz_documentation",
+  "parent":{
+    "name":"Pizazz",
+    "path":"folders/Libraries/Pizazz.yy",
   },
+  "resourceType":"GMNotes",
+  "resourceVersion":"2.0",
 }

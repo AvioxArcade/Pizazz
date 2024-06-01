@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "pizazz_particles",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "Pizazz",
-    "path": "folders/Libraries/Pizazz.yy",
+  "$GMScript":"",
+  "%Name":"pizazz_particles",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"pizazz_particles",
+  "parent":{
+    "name":"Pizazz",
+    "path":"folders/Libraries/Pizazz.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

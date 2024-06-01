@@ -1,9 +1,11 @@
 {
-  "resourceType": "GMNotes",
-  "resourceVersion": "1.1",
-  "name": "DevNotes",
-  "parent": {
-    "name": "Pizazz",
-    "path": "Pizazz.yyp",
+  "$GMNotes":"",
+  "%Name":"DevNotes",
+  "name":"DevNotes",
+  "parent":{
+    "name":"Pizazz",
+    "path":"Pizazz.yyp",
   },
+  "resourceType":"GMNotes",
+  "resourceVersion":"2.0",
 }
