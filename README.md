@@ -2,9 +2,9 @@
 
 **Pizazz** is a Wrapper Library for working with GM's built-in particle systems.
 
-It simplifies working with basic paricle systems by storing relevant data in structs and dynamically doing a lot of work for you.
+It simplifies working with basic paricle systems by doing a lot of work for you, often allowing multi-emitter particle systems with as few as one line of code.
 
-The only major setup required is creating/defining your particles in pizazz_particles.
+The only msetup required is creating/defining your particles in pizazz_particles.
 Afterward, Pizazz can use those particles and assign them to particle systems and emitters as requested.
 
 - ### [Download the YYPMS](https://github.com/AvioxArcade/Pizazz/releases)
