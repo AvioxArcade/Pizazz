@@ -5,6 +5,7 @@ if keyboard_check_pressed(vk_space)
 	fire_cursor.pause_resume();
 
 fire_cursor.move(mouse_x,mouse_y);
+pz_warp.move(mouse_x,mouse_y)
 
 //burst
 if mouse_check_button_pressed(mb_left) {	

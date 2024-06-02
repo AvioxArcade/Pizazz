@@ -27,7 +27,15 @@
 		if particle_exists(_particle){
 			//this is a particle system asset. import the data.
 			var _info = particle_get_info(_particle)
-			///TODO - actually import it.
+			//import particles
+			var _emitter_array = _info[$ "emitters"]
+			if !is_undefined(_emitter_array) {
+				for (var i = 0; i < array_length(_emitter_array); ++i) {
+					struct.__import_emitter_asset(_emitter_array[i])
+				}
+			} else __pizazz_echo("error importing particle system data")
+			
+			///TODO - import system defaults
 			
 		} else if _particle != undefined
 			struct.add_emitter(_particle, _emit_default)
@@ -261,6 +269,21 @@
 				
 			}
 		
+			static __import_emitter_asset = function(_emitter_data){
+				//import particle
+				var part_struct = _emitter_data[$ "parttype"]
+				if !is_undefined(part_struct){
+					var part_ind = part_struct[$ "ind"]
+					if !is_undefined(part_ind) {
+						var __e = add_emitter(0,_emitter_data[$ "number"])
+						__e.particle = part_ind;
+					} else __pizazz_echo("error importing particle system particle")
+				} else __pizazz_echo("error importing particle system emitter")
+				// TODO - import emitter data
+				
+			}	
+				
+		
 		#endregion
 		
 		static add_emitter = function(_particle, _emit_default = __pizazz_emit_default) {
@@ -269,6 +292,7 @@
 			emitter_qty++
 			return new_emitter;
 		}
+		
 		
 		static burst = function(amount=undefined){
 			if (active){

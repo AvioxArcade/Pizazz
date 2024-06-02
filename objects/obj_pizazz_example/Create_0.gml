@@ -1,6 +1,5 @@
 /// @description 
-
-pz_warp = create_pizazz(ps_warp)
+pz_warp = create_pizazz(ps_warp).move(5,5).stream()
 
 //normal fire
 fire_cursor = create_pizazz(PzParticle.fire,3)
