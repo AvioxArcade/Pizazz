@@ -1,7 +1,7 @@
 #region init
 	
-	#macro __pizazz_version			"1.1.1 Alpha"
-	#macro __pizazz_version_date	"June 1, 2024"
+	#macro __pizazz_version			"1.2 Release Candidate"
+	#macro __pizazz_version_date	"June 3, 2024"
 	
 	if (!variable_global_exists("__pizazz_particles")) global.__pizazz_particles = ds_map_create();
 	
@@ -19,15 +19,14 @@
 	//NOTE - please see `pizazz_documentation` for assistance
 	//NOTE - please see `pizazz_config` for config & default values
 	
-	function create_pizazz(_particle=undefined, _emit_default = __pizazz_emit_default){
-		///@arg PzParticle.p
+	function create_pizazz(_particle_or_asset=undefined, _emit_default = __pizazz_emit_default){
+		///@arg PzParticle_or_Asset
 		///@arg [emit_default]
 		var struct = new __pizazz_element()
-		
-		if particle_exists(_particle){
+		if typeof(_particle_or_asset) == "ref" && particle_exists(_particle_or_asset){
 			//this is a particle system asset. import the data.
-			var _info = particle_get_info(_particle)
-			//import particles
+			var _info = particle_get_info(_particle_or_asset)
+			//import emitters
 			var _emitter_array = _info[$ "emitters"]
 			if !is_undefined(_emitter_array) {
 				for (var i = 0; i < array_length(_emitter_array); ++i) {
@@ -35,10 +34,10 @@
 				}
 			} else __pizazz_echo("error importing particle system data")
 			
-			///TODO - import system defaults
+			struct.set_origin(_info.xorigin,_info.yorigin);
 			
-		} else if _particle != undefined
-			struct.add_emitter(_particle, _emit_default)
+		} else if _particle_or_asset != undefined
+			struct.add_emitter(_particle_or_asset, _emit_default)
 			
 		return struct
 	}
@@ -57,7 +56,9 @@
 		///@arg Particle.p
 		key = string(key)
 		var part = ds_map_find_value(global.__pizazz_particles,key)
-		if is_undefined(part) part = noone;
+		if is_undefined(part) {
+			__pizazz_echo("ERROR: key \"",key,"\" cannot be found in pizazz particles.");	
+		}
 		return part;
 	}
 
@@ -98,7 +99,7 @@
 		distr	= __pizazz_default_em_distr;
 		emitter = []
 		emitter_qty = 0;
-		time_source = noone;
+		time_source = undefined;
 		
 		active = true; //finishing an effect sets this to false and prevents any further stream/emit commands
 		
@@ -198,7 +199,7 @@
 					}
 				
 					static change_particle = function(__particle){
-						particle = __pizzaz_get_particle(__particle);
+						particle = __pizzaz_get_particle(__particle) ?? particle;
 						return self;
 					}
 				
@@ -211,10 +212,12 @@
 								)
 							//calculate emit factor
 							_amount = _amount >= 0 ? _amount*emitter_factor : _amount/emitter_factor
-							//fractions to negatives
-							if _amount < 1 && _amount > 0
-								_amount = -(1/_amount)
 						}
+						
+						//fractions to negatives
+						if _amount < 1 && _amount > 0
+							_amount = -(1/_amount)
+						
 						part_emitter_burst(system,ind,particle,_amount)	
 
 						return self;
@@ -225,11 +228,13 @@
 						if default_stream == 0 {
 							//calculate emit factor
 							_amount = _amount >= 0 ? _amount*emitter_factor : _amount/emitter_factor
-							
-							//fractions to negatives
-							if _amount < 1 && _amount > 0
-								_amount = -(1/_amount)
 						}
+						
+						//fractions to negatives
+						if _amount < 1 && _amount > 0
+							_amount = -(1/_amount)
+						
+						//save current stream amount
 						current_stream = _amount;
 						stream_paused = false;
 						part_emitter_stream(system,ind,particle,_amount)
@@ -270,21 +275,40 @@
 			}
 		
 			static __import_emitter_asset = function(_emitter_data){
-				//import particle
+				//verify validity
 				var part_struct = _emitter_data[$ "parttype"]
 				if !is_undefined(part_struct){
 					var part_ind = part_struct[$ "ind"]
 					if !is_undefined(part_ind) {
+						//create emitter
 						var __e = add_emitter(0,_emitter_data[$ "number"])
+						//import particle
 						__e.particle = part_ind;
+						//get emitter data
+						var _xmax = _emitter_data[$ "xmax"] ?? 0
+						var _xmin = _emitter_data[$ "xmin"] ?? 0
+						var _ymax = _emitter_data[$ "ymax"] ?? 0
+						var _ymin = _emitter_data[$ "ymin"] ?? 0
+						var _shape =_emitter_data[$ "shape"]
+						var _distro=_emitter_data[$ "distribution"]
+						var _w = _xmax - _ymin
+						var _h = _ymax - _ymin
+						var _xx = (_xmax + _xmin)/2;
+						var _yy = (_ymax + _ymin)/2;
+						//apply emitter data
+						__e.move(_xx,_yy).size(_w,_h,_shape,_distro)
 					} else __pizazz_echo("error importing particle system particle")
 				} else __pizazz_echo("error importing particle system emitter")
-				// TODO - import emitter data
-				
+
 			}	
 				
 		
 		#endregion
+		
+		static set_origin = function(_x = 0, _y = 0){
+			part_system_position(system,_x,_y);
+			return self;
+		}
 		
 		static add_emitter = function(_particle, _emit_default = __pizazz_emit_default) {
 			var new_emitter = new __emitter_element(_particle, _emit_default, self);
@@ -413,7 +437,7 @@
 		
 		static finish = function() {
 			//stops all emitters, once all particles are gone, destroys the effect.
-			if time_source == noone {
+			if is_undefined(time_source) {
 				var killcheck = function(){
 					if part_particles_count(system) == 0{
 						time_source_destroy(time_source)
@@ -450,7 +474,7 @@
 			if array_length(emitter) > ind && ind >= 0 {
 				return emitter[ind]	
 			} 
-			return noone;
+			return undefined;
 		}
 		
 		static get_part_emitter = function(_particle){
@@ -459,7 +483,7 @@
 				if (_emitter.particle == _particle)
 					return _emitter
 			}	
-			return noone;
+			return undefined;
 		}
 	}
 

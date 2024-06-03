@@ -1,5 +1,12 @@
-	
-	
+--------------------	
+PIZAZZ DOCUMENTATION
+--------------------
+NOTE - For a better experience, the most up-to-date online Wiki can be found at:
+
+https://github.com/AvioxArcade/Pizazz/wiki
+
+The following can also be used for offline reference.
+
 DESCRIPTION
 
 	Pizazz is a library/wrapper for working with GM's built-in particle systems.
@@ -57,17 +64,18 @@ EXMAPLE USAGE
 		fire.move(x,y).burst(12).finish();
 		
 	WARNING - if chaining methods together on the create_pizzaz() function, be careful with adding or getting 
-	any emitters, as they will return the emitter struct instead of the pizazz struct. For exmaple, the
-	following code will store the second emitter in the "fire" variable, instead of the pizazz system.
+	any emitters, as they will return the emitter element instead of the pizazz element. For exmaple, the
+	following code will store the second emitter in the "fire" variable, instead of the pizazz system, which 
+	will leave the pizazz system inaccessible.
 	
-		//DO NOT do this. 
-		//It will return the emitter element to the "fire" variable instead of the pizazz element:
+		//DO NOT do the following. 
+		//It will return the EMITTER element to the "fire" variable instead of the pizazz element:
 		fire = create_pizazz(PzParticle.fire).add_emitter(PzParticle.spark)
 
 	
 FUNCTIONS
 
-	create_pizazz([PzParticle.p],[emit_factor]) 
+	create_pizazz([PzParticle.p],[emit_default]) 
 
 		|	Creates a new pizazz element struct. 
 		|	
@@ -86,15 +94,17 @@ FUNCTIONS
 	pizazz_add_particle(particle_id, key)
 	
 		|	adds a particle type to the pizazz system that can be referenced by the given key.
-		|	pass in the particle ID returned when using 'part_type_create()'
+		|	included pizazz_particles defaults to an enum PzParticle for keys, but strings may
+		|	be used instead if preferred.
+		|	pass in the particle type ID returned when using 'part_type_create()'
 	
 
 PIZAZZ ELEMENT METHODS
 
 	The following methods can be called from the pizazz element. 
 	Each method that returns the pizazz element can be chained together, as shown in the examples above.
-		
-	.add_emitter(PzParticle.p,[emit_default])	
+	
+	.add_emitter(particle_key,[emit_default])	
 	
 		|	adds an emitter to the pizazz struct at the default values set in pizazz_config. 
 		|	Optionally, you can pass in a custom emit default which will set both the
@@ -105,12 +115,28 @@ PIZAZZ ELEMENT METHODS
 		
 	.size(w,h,[ps_shape],[ps_distr], [resize_emitters])
 
-		|	set the default emitter size and shape for this pizazz struct.
+		|	set the default emitter size and shape for this pizazz element.
 		|	if resize_emitters is true (default), this will also resizes all existing emitters 
 		|	to the given parameters.
 		|
-		|	NOTE - if using distrobution 'ps_distr_line', using method .line() is suggested, 
+		|	NOTE - if using shape 'ps_shape_line', using method .line() is suggested, 
 		|	or your results my be inconsistent
+		|		
+		|	RETURNS - pizazz element (self)
+	
+	.move(x,y,[z],[update_emitters],[update_depth])		
+	
+		|	Aet the default emitter location to the given x,y,[z]
+		|	if update_emitters is true (default), also updates all existing emitter locations to 
+		|	the given location.
+		|
+		|	If update_depth is true (default is set in config), also sets the particle system's depth 
+		|	based on the __pizazz_depth_formula macro found in pizazz_config. This default
+		|	can be changed with the macro __pizazz_option_autoUpdateDepth in pizazz_config or on
+		|   a per-pizazz element basis with .set_depth()
+		|
+		|	the optional z vaule is primarly intended to support top-down games that include height.
+		|	when provided, the z value is subtracted from the y value, but not considered when setting depth
 		|		
 		|	RETURNS - pizazz element (self)
 		
@@ -119,7 +145,7 @@ PIZAZZ ELEMENT METHODS
 		|	set the default emitter shape to ps_distr_line with a line travelling from (x1,y1)
 		|	to (x2,y2). Replaces need for .size() and .move(), since ps_shape_line uses emitter 
 		|	regions differently.
-		|	if resize_emitters is true (default), this will also resizes all existing emitters 
+		|	if resize_emitters is true (default), this will also resize all existing emitters 
 		|	to the given parameters.
 		|
 		|	NOTE - to move the line, instead of using .move() to move the line, consider calling 
@@ -127,18 +153,19 @@ PIZAZZ ELEMENT METHODS
 		|
 		|	RETURNS - pizzaz element (self)
 		
-	.move(x,y,[z],[update_emitters],[update_depth])		
+	.offsets([xOff],[yOff],[update_emitters])
 	
-		|	set the default emitter location to the given x,y,[z]
-		|	if update_emitters is true (default), also updates all emitter locations to 
-		|	the given location.
-		|	if update_depth is true (default set in config), also sets the system's depth based on 
-		|	the __pizazz_depth_formula macro found in pizazz_config. this default
-		|	can be changed with the macro __pizazz_option_autoUpdateDepth in pizazz_config or on
-		|   a per-pizazz element basis with .set_depth()
-		|		
+		|	Offsets are an optional margin/offset that can be applied to an emitter so you can, 
+		|	e.g. move an emitter to a torch object's x,y location without having to add/subtract the
+		|	desired offset each time to line the emitter up with the sprite.
+		| 
+		|	Sets the default x offset and y offset of all emitters to the given values. 
+		|	If not provided, it leaves them as is. (To reset/remove offsets, set them to 0)
+		|	if update_emitters is true (default), also updates all existing emitter locations to factor 
+		|	in the given offsets.
+		|	
 		|	RETURNS - pizazz element (self)
-		
+	
 	.set_depth(depth, [auto_update])
 		
 		|	Sets the particle system depth to a specific value. Useful when you don't want depth to be 
@@ -146,26 +173,21 @@ PIZAZZ ELEMENT METHODS
 		|	with auto_update, you can optionally turn on(true) or off(false) auto depth updating. If not
 		|	provided, it won't be changed.
 		|
-		|	RETURNS - pizazz element (self
-		
-	.offsets([xOff],[yOff],[update_emitters])
-	
-		|	Sets the default x offset and y offset of all emitters to the given values. 
-		|	If not provided, it leaves them as is.
-		|	if update_emitters is true (default), also updates all existing emitter locations to factor 
-		|	in the given offsets.
-		|	
 		|	RETURNS - pizazz element (self)
 	
 	.burst([amount])
 	
 		|	calls the burst() method of every emitter in this pizazz element.
+		|	if a fraction between 0 and 1 is passed, it will automatically convert to a negative number
+		|   (e.g. .5 => -2, .1 => -10,. etc)
 		|		
 		|	RETURNS - pizazz element (self)
 			
 	.stream([amount])
 	
 		|	calls the stream() method of every emitter in this pizazz element.
+		|	if a fraction between 0 and 1 is passed, it will automatically convert to a negative number
+		|   (e.g. .5 => -2, .1 => -10,. etc)
 		|		
 		|	RETURNS - pizazz element (self)
 
@@ -189,24 +211,38 @@ PIZAZZ ELEMENT METHODS
 	.get_emitter_ind(ind)
 	
 		|	returns the given emitter struct, if it exists, based on creation order (emitter 
-		|	0 would be the first one added to the struct). else returns keyword noone.
+		|	0 would be the first one added to the struct). else returns keyword undefined.
 		|
-		|	RETURNS - emitter element OR keyword noone
+		|	RETURNS - emitter element OR undefined
 			
 	.get_part_emitter(PzParticle.p)
 	
 		|	returns the first emitter found with the given PzParticle.p, if it exists. 
-		|	Otherwise, ruturns keyword noone.
+		|	Otherwise, ruturns keyword undefined.
 		|
-		|	RETURNS - emitter element OR keyword noone
+		|	RETURNS - emitter element OR undefined
+		
+	.set_origin([x],[y])
+		
+		|	Sets the particle system orgin relative to the room, like the built in function 
+		|   "part_system_position()"
+		|
+		|   This value is addative to any .move() calls, and may cause unexpected results.
+		|	To reset the origin, call without any arguments.
+		|
+		|	DEV NOTE - This function primarily exists to support importing Particle System Assets, 
+		|   and generally isn't recommended to be used. instead, consider using .offsets()
+		|		
+		|	RETURNS - pizazz element (self)
 			
 	
 
 PIZZAZ EMITTER ELEMENT METHODS
 	
 	These methods can be used to modify emitter elements returned from 
-	add_emitter(), get_emitter_ind(), and get_part_emitter(). Many of them are similar to the
-	above methods, but are intended to change just one emitter rather than the whole pizzaz element
+	add_emitter(), get_emitter_ind(), and get_part_emitter(). Many of them are similar/sthe same as the
+	above pizazz element methods, but are intended to change just one emitter rather than the whole 
+	pizzaz element / all its emitters
 	
 	.size(w,h,[ps_shape],[ps_distr])
 	
@@ -217,23 +253,9 @@ PIZZAZ EMITTER ELEMENT METHODS
 		|	or your results my be inconsistent
 		|
 		|	WARNING -  calling .size() from the pizzaz element can override changes set here on 
-		|	a per-emitter basis
+		|	a per-emitter basis if `resize_emitters` is set to true(default)
 		|		
 		|	RETURNS - emitter element (self)
-		
-	.line(x1,y1,x2,y2,[ps_distr])
-		
-		|	set the current emitter shape to ps_distr_line with a line travelling from (x1,y1)
-		|	to (x2,y2). Replaces need for .size() and .move(), since ps_shape_line uses emitter 
-		|	regions differently.
-		|
-		|	NOTE - to move the line, instead of using .move() to move the line, consider calling 
-		|	.line() again or using .offsets() to shift the line.
-		|
-		|	WARNING -  calling .line() from the pizzaz element can override changes set here on 
-		|	a per-emitter basis
-		|
-		|	RETURNS - pizzaz element (self)
 			
 	.move(x,y,[z])
 	
@@ -245,6 +267,20 @@ PIZZAZ EMITTER ELEMENT METHODS
 		|	individual emitters.
 		|		
 		|	RETURNS - emitter element (self)
+		
+	.line(x1,y1,x2,y2,[ps_distr])
+		
+		|	set the current emitter shape to ps_shape_line with a line travelling from (x1,y1)
+		|	to (x2,y2). Replaces need for .size() and .move(), since ps_shape_line uses emitter 
+		|	regions differently.
+		|
+		|	NOTE - to move the line, instead of using .move() to move the line, consider calling 
+		|	.line() again or using .offsets() to shift the line.
+		|
+		|	WARNING -  calling .line() from the pizzaz element can override changes set here on 
+		|	a per-emitter basis if `resize_emitters` is set to true(default)
+		|
+		|	RETURNS - pizzaz element (self)
 		
 	.offsets([xOff],[yOff])
 	
@@ -261,6 +297,8 @@ PIZZAZ EMITTER ELEMENT METHODS
 		|	Bursts the amount of particles set by emit_defaults() or on emitter creation.
 		|	If an amount argument is provided, the emit default will be ignored and 
 		|	the emitter will burst the given amount, adjusted by the emit factor (if set)
+		|	if a fraction between 0 and 1 is passed, it will automatically convert to a negative number
+		|   (e.g. .5 => -2, .1 => -10,. etc)
 		|		
 		|	RETURNS - emitter element (self)
 			
@@ -269,13 +307,16 @@ PIZZAZ EMITTER ELEMENT METHODS
 		|	Streams the amount of particles set by emit_defaults() or on emitter creation.
 		|	If an amount argument is provided, the emit default will be ignored and 
 		|	the emitter will stream the given amount, adjusted by the emit factor (if set)
+		|	if a fraction between 0 and 1 is passed, it will automatically convert to a negative number
+		|   (e.g. .5 => -2, .1 => -10,. etc)
 		|		
 		|	RETURNS - emitter element (self)
 		
 	.pause_resume()
 	
-		|	If the emitter is streaming, it pauses it. 
-		|	If the emitter is paused, it resumes streaming.
+		|	If the emitter is streaming, it stops streaming when this is called. 
+		|	If the emitter was previously paused, it resumes streaming at the same amounts 
+		|	when this is called.
 		|	
 		|	NOTE - pausing an emitter then calling stream() overrides any paused state.
 		|		
@@ -283,11 +324,11 @@ PIZZAZ EMITTER ELEMENT METHODS
 
 	.emit_defaults([burst_amount],[stream_amount])
 	
-		|	Sets separate burst or stream emit defaults, (rather than them being the same number as when 
+		|	Sets separate burst or stream emit defaults, (rather than them being the same amount, as when 
 		|	creating the emitter) and removes any previously set emit factor.
 		|
 		|	NOTE - each emitter is designed to either use an emit default OR an emit factor, 
-		|	not both. If trying to use both, only the most recently set will be considered.
+		|	not both. When calling this, any previously set emit factor will be overridden.
 		|
 		|	RETURNS - emitter element (self)
 		
@@ -298,7 +339,7 @@ PIZZAZ EMITTER ELEMENT METHODS
 		|	the amount to a negative number so that the result is as expected (e.g. .5 => -2, .1 => -10,. etc)
 		|
 		|	NOTE - each emitter is designed to either use an emit default OR an emit factor, 
-		|	not both. If trying to use both, only the most recently set will be considered.
+		|	not both. When calling this, any previously set emit defaults will be overriden.
 		|
 		|	RETURNS - emitter element (self)
 

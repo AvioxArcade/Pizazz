@@ -13,4 +13,5 @@
 
 #macro __pizazz_option_autoUpdateDepth	true				//default setting for if a pizazz element's depth should automatically be updated when moved
 #macro __pizazz_depth_formula			-(yMid+yOff)		//the calculation used to update a pizazz element's depth. 'yMid' is the middle of the emitter region
-															// (in case your game is using something other than 'depth = -y')
+															//...(in case your game is using something other than 'depth = -y')
+															//...If you want depth to be the bottom of the emitter, use -(yMid+yoff+(height/2))
