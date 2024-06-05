@@ -126,7 +126,7 @@ PIZAZZ ELEMENT METHODS
 	
 	.move(x,y,[z],[update_emitters],[update_depth])		
 	
-		|	Aet the default emitter location to the given x,y,[z]
+		|	Set the default emitter location to the given x,y,[z]
 		|	if update_emitters is true (default), also updates all existing emitter locations to 
 		|	the given location.
 		|
