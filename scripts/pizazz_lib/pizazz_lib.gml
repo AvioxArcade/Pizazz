@@ -1,7 +1,7 @@
 #region init
 	
-	#macro __pizazz_version			"1.2 Release Candidate"
-	#macro __pizazz_version_date	"June 3, 2024"
+	#macro __pizazz_version			"1.2"
+	#macro __pizazz_version_date	"June 5, 2024"
 	
 	if (!variable_global_exists("__pizazz_particles")) global.__pizazz_particles = ds_map_create();
 	

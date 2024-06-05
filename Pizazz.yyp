@@ -32,6 +32,7 @@
     {"id":{"name":"pizazz_particles","path":"scripts/pizazz_particles/pizazz_particles.yy",},},
     {"id":{"name":"GM_Electricity_spr_Electricity1","path":"sprites/GM_Electricity_spr_Electricity1/GM_Electricity_spr_Electricity1.yy",},},
     {"id":{"name":"GM_FlameIntensity_spr_Fire","path":"sprites/GM_FlameIntensity_spr_Fire/GM_FlameIntensity_spr_Fire.yy",},},
+    {"id":{"name":"sprite_code_examples","path":"sprites/sprite_code_examples/sprite_code_examples.yy",},},
   ],
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
